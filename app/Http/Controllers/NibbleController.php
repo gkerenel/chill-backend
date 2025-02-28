@@ -41,7 +41,7 @@ class NibbleController extends Controller
 
         $nibble = $delight->nibbles()->create([
             'gourmet_id' => Auth::id(),
-            'content' => $request->content,
+            'content' => $request['content'],
         ]);
 
         return new NibbleResource($nibble->load('gourmet'));

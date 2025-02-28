@@ -50,13 +50,13 @@ class Gourmet extends Authenticatable
 
     public function tasting(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'tastes', 'follower_id', 'following_id')
+        return $this->belongsToMany(self::class, 'tastes', 'taster_id', 'gourmet_id')
             ->withTimestamps();
     }
 
     public function tasters(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'tastes', 'following_id', 'follower_id')
+        return $this->belongsToMany(self::class, 'tastes', 'gourmet_id', 'taster_id')
             ->withTimestamps();
     }
 

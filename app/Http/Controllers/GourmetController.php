@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class GourmetController extends Controller
 {
-    public function follow(Gourmet $gourmet): JsonResponse
+    public function taste(Gourmet $gourmet): JsonResponse
     {
         if (Auth::id() === $gourmet->id) {
             return response()->json(['message' => 'Cannot follow yourself'], 400);
@@ -24,7 +24,7 @@ class GourmetController extends Controller
         return response()->json(['message' => 'Successfully followed gourmet']);
     }
 
-    public function unfollow(Gourmet $gourmet): JsonResponse
+    public function spit(Gourmet $gourmet): JsonResponse
     {
         if (Auth::user()->isTasting($gourmet)) {
             Auth::user()->tasting()->detach($gourmet->id);

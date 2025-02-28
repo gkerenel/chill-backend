@@ -7,44 +7,53 @@ use App\Http\Resources\DelightResource;
 use App\Models\Delight;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DelightController extends Controller
 {
-    public function index(): DelightCollection
+    public function index(): LengthAwarePaginator
     {
         $gourmet = Auth::user();
 
-        $followingIds = $gourmet->tasting()->pluck('taster_id');
-        $followingIds->push($gourmet->id);
+        $tasting_ids = $gourmet->tasting()->pluck('taster_id');
+        $tasting_ids->push($gourmet->id);
 
         $delights = Delight::with('gourmet')
-            ->where(function ($query) use ($followingIds) {
-                $query->whereIn('gourmet_id', $followingIds)
+            ->where(function ($query) use ($tasting_ids) {
+                $query->whereIn('gourmet_id', $tasting_ids)
                     ->orWhere('public', true);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
 
-        return new DelightCollection($delights);
+        return $delights;
     }
 
-    public function store(Request $request): DelightResource
+    public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'public' => 'boolean',
+        $validator = Validator::make($request->all(), [
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'public' => ['required', 'boolean'],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $delight = Delight::create([
             'gourmet_id' => Auth::id(),
             'title' => $request->title,
-            'content' => $request->content,
+            'content' => $request['content'],
             'public' => $request->input('public', false),
         ]);
 
-        return new DelightResource($delight->load('gourmet'));
+        return $delight;
     }
 
     public function show(Delight $delight): DelightResource|JsonResponse
@@ -107,7 +116,7 @@ class DelightController extends Controller
         return new DelightResource($delight->load('gourmet', 'eats'));
     }
 
-    public function uneat(Delight $delight): DelightResource|JsonResponse
+    public function spit(Delight $delight): DelightResource|JsonResponse
     {
         $gourmet = Auth::user();
         if ($delight->public && !$gourmet->isTasting($delight->gourmet)) {

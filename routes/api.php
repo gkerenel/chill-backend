@@ -17,12 +17,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 
-    Route::apiResource('delights', DelightController::class);
+    Route::get('/delight', [DelightController::class, 'index']);
+    Route::post('/delight', [DelightController::class, 'store']);
+    Route::get('/delight/{delight}', [DelightController::class, 'show']);
+    Route::put('/delight/{delight}', [DelightController::class, 'update']);
+    Route::delete('/delight/{delight}', [DelightController::class, 'destroy']);
+    Route::post('delights/{delight}/eat', [DelightController::class, 'eat']);
+    Route::post('delights/{delight}/spit', [DelightController::class, 'spit']);
+
     Route::apiResource('delights.nibbles', NibbleController::class)->shallow();
 
-    Route::post('delights/{delight}/eat', [DelightController::class, 'eat']);
-    Route::post('delights/{delight}/uneat', [DelightController::class, 'uneat']);
-
-    Route::post('gourmets/{gourmet}/follow', [GourmetController::class, 'follow']);
-    Route::post('gourmets/{gourmet}/unfollow', [GourmetController::class, 'unfollow']);
+    Route::post('gourmets/{gourmet}/taste', [GourmetController::class, 'taste']);
+    Route::post('gourmets/{gourmet}/spit', [GourmetController::class, 'spit']);
 });

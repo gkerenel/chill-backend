@@ -33,8 +33,8 @@ class Delight extends Model
         return $this->hasMany(Eat::class);
     }
 
-    public function isEatenBy(int $gourmetId): bool
+    public function isEatenBy(int $gourmet_id): bool
     {
-        return $this->eats()->where('gourmet_id', $gourmetId)->exists();
+        return $this->eats()->where('gourmet_id', $gourmet_id)->exists();
     }
 }
